@@ -1,7 +1,6 @@
 var express = require("express")
 var Mongoclient = require("mongodb").MongoClient
 var cors = require("cors")
-const multer = require("multer")
 
 var app = express()
 app.use(cors())
@@ -14,14 +13,17 @@ var database
 app.listen(5038,()=>{
     Mongoclient.connect(CONNECTION_STRING, (error,client)=>{
         database = client.db(dbname)
-        console.log("Connected")
+        console.log("Connected to Database")
+        console.log("Backend-Armed: http://localhost:5038")
     })
 })
 
-
-app.get("/",(request,response)=>{
-    response.send("Backend-Armed")
+app.get("/", (req,res)=>{
+    res.json({
+        msg: "WORKING"
+    })
 })
+
 
 app.get("/api/PF/getStocks/:stock",(request,response)=>{
     database.collection(request.params.stock).find({}).toArray((error,result)=>{
