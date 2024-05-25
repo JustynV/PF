@@ -75,9 +75,12 @@ if st.button('Analizar'):
         hovermode='x'
     )
 
-    fig = go.Figure(data=[trace], layout=layout)
-    st.plotly_chart(fig)
-    collection_name = f"Sentimientos {stock.capitalize()}"
+    fig1 = go.Figure(data=[trace], layout=layout)
+    st.plotly_chart(fig1)
+
+    collection_name = f"Sentimientos {stock.title()}"
+
+    st.write(stock)
 
     if(collection_name in stocks):
         data_from_db = fetch_data(collection_name)
@@ -128,7 +131,6 @@ if st.button('Analizar'):
         )
 
         # Crear la figura
-        fig = go.Figure(data=[trace_price, trace_sentiment], layout=layout)
+        fig2 = go.Figure(data=[trace_price, trace_sentiment], layout=layout)
+        st.plotly_chart(fig2)
 
-        # Mostrar la figura
-        st.plotly_chart(fig)
