@@ -80,7 +80,6 @@ if st.button('Analizar'):
 
     collection_name = f"Sentimientos {stock.title()}"
 
-    st.write(stock)
 
     if(collection_name in stocks):
         data_from_db = fetch_data(collection_name)
