@@ -94,6 +94,7 @@ if st.button('Analizar'):
         df_nlp = pd.DataFrame(data_from_db)
         df_nlp['date'] = pd.to_datetime(df_nlp['date'])
         df_nlp = df_nlp.sort_values(by='date')
+
         fecha_minima = df_nlp['date'].min()
         fecha_maxima = pd.Timestamp.now()
         df['date'] = pd.to_datetime(df.index)
@@ -114,6 +115,9 @@ if st.button('Analizar'):
 
         window_size = 10
         df_nlp['smoothed_sentiment'] = df_nlp['normalized_sentiment'].rolling(window=window_size, min_periods=1).mean()
+        df_LR = df_nlp[df_nlp['revista'] == "larepublica.co"]
+        df_PF = df_nlp[df_nlp['revista'] == "portafolio.co"]
+        
         trace_price = go.Scatter(
             x=df_candlestick_filtered['date'],
             y=df_candlestick_filtered['normalized_price'],
@@ -130,6 +134,22 @@ if st.button('Analizar'):
             hoverinfo='x+y',
         )
 
+        trace_larepublica = go.Scatter(
+            x=df_LR['date'],
+            y=df_LR['smoothed_sentiment'],
+            mode='lines',
+            name=f'Sentimientos NLP (La República)(Promedio Móvil, Ventana={window_size})',
+            hoverinfo='x+y',
+        )
+
+        trace_portafolio = go.Scatter(
+            x=df_PF['date'],
+            y=df_PF['smoothed_sentiment'],
+            mode='lines',
+            name=f'Sentimientos NLP (Portafolio.co)(Promedio Móvil, Ventana={window_size})',
+            hoverinfo='x+y',
+        )
+
         # Crear el layout con el rango ajustado
         layout = go.Layout(
             title='Precios de la acción y Sentimientos de las noticias normalizados a lo largo del tiempo',
@@ -138,7 +158,7 @@ if st.button('Analizar'):
             hovermode='closest',
         )
 
-        fig2 = go.Figure(data=[trace_price, trace_sentiment], layout=layout)
+        fig2 = go.Figure(data=[trace_price, trace_sentiment, trace_larepublica, trace_portafolio], layout=layout)
         st.plotly_chart(fig2)
 
 

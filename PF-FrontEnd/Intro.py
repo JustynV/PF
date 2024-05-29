@@ -60,6 +60,4 @@ fig2 = px.pie(df2, names='Collection', values='Count', title='Proporciones de da
 st.plotly_chart(fig1)
 st.plotly_chart(fig2)
 
-st.title("Referencias a librerías usadas")
-
 
