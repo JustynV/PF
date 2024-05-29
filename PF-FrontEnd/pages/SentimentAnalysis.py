@@ -7,10 +7,22 @@ import plotly.graph_objects as go
 
 
 load_dotenv()
+st.set_page_config(page_title="EasyStock Análisis Sentimientos",
+                   page_icon="imgs/EasyStockS2.jpg")
 
 MONGO_URI = os.getenv('MONGO_URI')
 DATABASE_NAME = "stock"
-DATABASE_NAME2 = "sentiment"
+
+def get_all_news_dates(collection_name):
+    db = get_database()
+    dates = db[collection_name].find({}, {"date": 1, "_id": 0})
+    return [news['date'] for news in dates]
+
+def get_news_by_date(date, collection_name):
+    db = get_database()
+    date_str = date.strftime("%Y-%m-%d")
+    news = list(db[collection_name].find({"date": date_str}, {"_id": 0, "article": 1, "sentiment": 1}))
+    return news
 
 
 @st.cache_resource
@@ -88,6 +100,7 @@ if st.button('Analizar'):
         df = df[[
             'date', '1. open', '2. high', '3. low', '4. close', '5. volume']]
         df = df.sort_values(by='date')
+
         df_candlestick_filtered = df.loc[(
             df['date'] >= fecha_minima) & (df['date'] <= fecha_maxima)]
 
@@ -121,10 +134,12 @@ if st.button('Analizar'):
         layout = go.Layout(
             title='Precios de la acción y Sentimientos de las noticias normalizados a lo largo del tiempo',
             xaxis=dict(title='Fecha'),
-            yaxis=dict(title='Valor Normalizado', range=[-1, 1]),  # Ajusta el rango según tus necesidades
+            yaxis=dict(title='Valor Normalizado', range=[-1, 1]),
             hovermode='closest',
         )
 
-        # Crear la figura
         fig2 = go.Figure(data=[trace_price, trace_sentiment], layout=layout)
         st.plotly_chart(fig2)
+
+
+        
