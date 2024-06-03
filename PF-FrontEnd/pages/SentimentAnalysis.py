@@ -109,19 +109,25 @@ if st.button('Analizar'):
         max_price = df_candlestick_filtered['1. open'].max()
         df_candlestick_filtered['normalized_price'] = 2 * ((df_candlestick_filtered['1. open'] - min_price) / (max_price - min_price)) - 1
 
+
         min_sentiment = df_nlp['sentiment'].min()
         max_sentiment = df_nlp['sentiment'].max()
         df_nlp['normalized_sentiment'] = 2 * ((df_nlp['sentiment'] - min_sentiment) / (max_sentiment - min_sentiment)) - 1
 
         window_size = 10
+
         df_nlp['smoothed_sentiment'] = df_nlp['normalized_sentiment'].rolling(window=window_size, min_periods=1).mean()
+        
+        df_nlp = pd.merge(df_nlp, df_candlestick_filtered, on='date', how='inner')
+
         df_LR = df_nlp[df_nlp['revista'] == "larepublica.co"]
         df_PF = df_nlp[df_nlp['revista'] == "portafolio.co"]
         df_F = df_nlp[df_nlp['revista'] == "forbes.co"]
         
+
         trace_price = go.Scatter(
             x=df_candlestick_filtered['date'],
-            y=df_candlestick_filtered['normalized_price'],
+            y= df_candlestick_filtered['normalized_price'],
             mode='lines',
             name='Precio de la acción (Normalizado)',
             hoverinfo='x+y',
@@ -131,7 +137,7 @@ if st.button('Analizar'):
             x=df_nlp['date'],
             y=df_nlp['smoothed_sentiment'],
             mode='lines',
-            name=f'Sentimientos NLP (Promedio Móvil, Ventana={window_size})',
+            name=f'Sentimientos NLP Generales (Promedio Móvil, Ventana={window_size})',
             hoverinfo='x+y',
         )
 
@@ -155,7 +161,7 @@ if st.button('Analizar'):
             x=df_F['date'],
             y=df_F['smoothed_sentiment'],
             mode='lines',
-            name=f'Sentimientos NLP (Portafolio.co)(Promedio Móvil, Ventana={window_size})',
+            name=f'Sentimientos NLP (Forbes.co)(Promedio Móvil, Ventana={window_size})',
             hoverinfo='x+y',
         )
 
