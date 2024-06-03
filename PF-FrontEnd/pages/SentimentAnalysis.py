@@ -117,6 +117,7 @@ if st.button('Analizar'):
         df_nlp['smoothed_sentiment'] = df_nlp['normalized_sentiment'].rolling(window=window_size, min_periods=1).mean()
         df_LR = df_nlp[df_nlp['revista'] == "larepublica.co"]
         df_PF = df_nlp[df_nlp['revista'] == "portafolio.co"]
+        df_F = df_nlp[df_nlp['revista'] == "forbes.co"]
         
         trace_price = go.Scatter(
             x=df_candlestick_filtered['date'],
@@ -150,6 +151,14 @@ if st.button('Analizar'):
             hoverinfo='x+y',
         )
 
+        trace_Forbes = go.Scatter(
+            x=df_F['date'],
+            y=df_F['smoothed_sentiment'],
+            mode='lines',
+            name=f'Sentimientos NLP (Portafolio.co)(Promedio Móvil, Ventana={window_size})',
+            hoverinfo='x+y',
+        )
+
         # Crear el layout con el rango ajustado
         layout = go.Layout(
             title='Precios de la acción y Sentimientos de las noticias normalizados a lo largo del tiempo',
@@ -158,7 +167,7 @@ if st.button('Analizar'):
             hovermode='closest',
         )
 
-        fig2 = go.Figure(data=[trace_price, trace_sentiment, trace_larepublica, trace_portafolio], layout=layout)
+        fig2 = go.Figure(data=[trace_price, trace_sentiment, trace_larepublica, trace_portafolio, trace_Forbes], layout=layout)
         st.plotly_chart(fig2)
 
 
